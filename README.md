@@ -17,7 +17,7 @@ Rscript setup_dada2.R
 ## Using dada2\_single\_end_auto.R to get DAD2 sequences as OTUs:
 1. Run split libraries:
 	```
-	split_libraries_fastq.py -i {INSERT_PATH_TO_YOUR_READ_1} -b {INSERT_PATH_TO_YOUR_READ_1} -o slout/ -m {INSERT_PATH_TO_YOUR_MAPPING_FILE} -r 1000 -p 0.0 -n 1000 -q 0 --rev_comp_mapping_barcodes --store_demultiplexed_fastq
+	split_libraries_fastq.py -i {INSERT_PATH_TO_YOUR_READ_1} -b {INSERT_PATH_TO_YOUR_BARCODE} -o slout/ -m {INSERT_PATH_TO_YOUR_MAPPING_FILE} -r 1000 -p 0.0 -n 1000 -q 0 --rev_comp_mapping_barcodes --store_demultiplexed_fastq
 	```
 2. Split slout into one fastq per sample:
 	```
@@ -35,7 +35,7 @@ Rscript setup_dada2.R
 5. Align sequences, make a tree, remove pynast failues
 	```
 	align_seqs.py -i dada2.fasta
-	make_phylogeny.py -i pynast_aligned/dada2_aligned.fasta
+	make_phylogeny.py -i pynast_aligned/dada2_aligned.fasta -o dada2.tre
 	python remove_pynast_failures.py -f pynast_aligned/dada2_failures.fasta -i dada2_w_tax.biom -o dada2_w_tax_no_pynast_failures.biom
 	```
 
