@@ -20,6 +20,11 @@ find.first.bad <- function(i, first.under=30, ignore.bases=10) {
   return(first_under_30)
 }
 
+find.read.len <- function(i) {
+  qqF <- qa(i)[["perCycle"]]
+  return(max(qqF$quality$Cycle)-2)
+}
+
 fastqFilter.multi <- function(i, inputs, outputs, trim.len.F, trunc.len.F) {
   fastqFilter(inputs[i], outputs[i], maxN=0, maxEE=2, truncQ=2, trimLeft=trim.len.F, truncLen=trunc.len.F, compress=TRUE)
 }
@@ -32,7 +37,8 @@ run.dada2 <- function(path, analysis.name='dada2', tmp.dir='tmp', min.qual=30, q
 
 	# determine truncation point
 	first.bad.F <- unlist(mclapply(paste0(path, '/', fnFs), find.first.bad, first.under=min.qual, mc.cores=threads))
-	trunc.len.F <- quantile(first.bad.F, .2)
+	read.len.F <- unlist(mclapply(paste0(path, '/', fnFs), find.read.len, mc.cores=threads))
+	trunc.len.F <- min(c(quantile(first.bad.F, .2), read.len.F))
 	print(trunc.len.F)
 
 	# quality filter files
