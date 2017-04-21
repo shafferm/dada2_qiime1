@@ -1,3 +1,5 @@
+#!/usr/bin/env python2
+
 from biom import load_table
 from biom.table import Table
 import argparse

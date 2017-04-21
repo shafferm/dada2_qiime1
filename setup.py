@@ -4,6 +4,7 @@ from rpy2 import robjects
 
 __author__ = 'shafferm'
 
+
 class CustomInstallCommand(install):
     """Customized setuptools install command - prints a friendly greeting."""
     def run(self):
@@ -16,7 +17,7 @@ class CustomInstallCommand(install):
         r_biocLite = robjects.r['biocLite']
 
         # install argparser
-        r_install_packages("argparser", repos = "http://cran.us.r-project.org")
+        r_install_packages("argparser", repos="http://cran.us.r-project.org")
 
         # install dada2
         r_biocLite('dada2')
@@ -32,5 +33,6 @@ setup(
     author="Michael Shaffer",
     author_email='michael.shaffer@ucdenver.edu',
     package_data={'': ['*.r', '*.R']},
-    include_package_data=True
+    include_package_data=True,
+    install_requires=['rpy2', 'biom-format', 'numpy']
 )
