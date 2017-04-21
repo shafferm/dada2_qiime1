@@ -16,7 +16,7 @@ class CustomInstallCommand(install):
         r_biocLite = robjects.r['biocLite']
 
         # install argparser
-        install_packages("argparser", repos = "http://cran.us.r-project.org")
+        r_install_packages("argparser", repos = "http://cran.us.r-project.org")
 
         # install dada2
         r_biocLite('dada2')
@@ -31,4 +31,6 @@ setup(
     description="Using DADA2 with qiime 1",
     author="Michael Shaffer",
     author_email='michael.shaffer@ucdenver.edu',
+    package_data={'': ['*.r', '*.R']},
+    include_package_data=True
 )
