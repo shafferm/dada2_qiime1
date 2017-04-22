@@ -5,7 +5,6 @@ def get_dir():
     """
     # Get the full path of util.py
     current_file_path = abspath(__file__)
+    print current_file_path
     # Get the directory containing util.py
-    current_dir_path = dirname(current_file_path)
-    # Return the directory containing the directory containing util.py
-    return dirname(current_dir_path)
+    return dirname(current_file_path)

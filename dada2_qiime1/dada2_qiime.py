@@ -25,10 +25,11 @@ class CommandCaller(object):
         Calls commands (given as lists of strings), records stdout and stderr
         Raises an informative error if cmd fails
         """
+        print ' '.join(cmd)
         if subprocess.call(cmd, stdout=self.log, stderr=self.error):
             error_msg = open(self.error_path).read()
             self.exit()
-            raise RuntimeError("Error in %s\n" % cmd[-1] + error_msg)
+            raise RuntimeError("Error in %s\n" % cmd[0] + error_msg)
 
     def call_commands(self):
         """Pop off and call every command in the queue"""
@@ -58,14 +59,14 @@ def run(input_fastq, barcode_fastq, mapping_file):
     r_source = robjects.r['source']
     _ = r_source(path.join(get_dir(), 'dada2_single_end_auto.R'), echo=False, verbose=False)
     r_run_dada2 = robjects.r['run.dada2']
-    r_run_dada2('data/raw_data/slout_split')
+    r_run_dada2('slout_split')
 
     # qiime assign taxonomy
     commander.add_command(['assign_taxonomy.py', '-i', 'dada2.fasta'])
     # qiime add metadata to biom
-    commander.add_command(['biom add-metadata', '-o', 'dada2_w_tax.biom', '--observation-metadata-fp',
-                           'uclust_assigned_taxonomy/dada2_tax_assignments.txt', '--sc-separated', 'taxonomy',
-                           '--observation-header', 'OTUID,taxonomy'])
+    commander.add_command(['biom', 'add-metadata', '-i', 'dada2.tsv', '-o', 'dada2_w_tax.biom',
+                           '--observation-metadata-fp', 'uclust_assigned_taxonomy/dada2_tax_assignments.txt',
+                           '--sc-separated', 'taxonomy', '--observation-header', 'OTUID,taxonomy'])
     # qiime align sequences
     commander.add_command(['align_seqs.py', '-i', 'dada2.fasta'])
     # qiime make phylogeny
@@ -73,3 +74,4 @@ def run(input_fastq, barcode_fastq, mapping_file):
     # call remove pynast failures
     commander.add_command(['remove_pynast_failures.py', '-f', 'pynast_aligned/dada2_failures.fasta', '-i',
                            'dada2_w_tax.biom', '-o', 'dada2_w_tax_no_pynast_failures.biom'])
+    commander.call_commands()
