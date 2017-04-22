@@ -21,7 +21,7 @@ find.first.bad <- function(i, first.under=30, ignore.bases=10) {
 }
 
 fastqFilter.multi <- function(i, inputs, outputs, trim.len.F, trunc.len.F) {
-  fastqFilter(inputs[i], outputs[i], maxN=0, maxEE=2, truncQ=2, trimLeft=trim.len.F, truncLen=trunc.len.F, compress=TRUE)
+  fastqFilter(inputs[i], outputs[i], maxEE=2,  rm.phix=TRUE, trimLeft=trim.len.F, truncLen=trunc.len.F, compress=TRUE)
 }
 
 run.dada2 <- function(path, analysis.name='dada2', tmp.dir='tmp', min.qual=30, quant=.2, threads=3, keep.tmp=F) {
