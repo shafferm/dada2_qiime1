@@ -5,7 +5,7 @@ Generating all required files for `core_diversity_analyses.py` using QIIME 1 and
 First create a new conda environment:
 
 ```
-conda create --name dada2_qiime python=2.7 qiime R
+conda create --name dada2_qiime python=2.7 qiime R rpy2
 ``` 
 
 Download this repository:
@@ -16,12 +16,17 @@ git clone https://github.com/shafferm/dada2_qiime1.git
 Change directories into it and then run:
 
 ```
-python setupy.py install
+python setup.py install
 ```
 
 ## Running dada2 without OTU picking
 ```
 qiime_dada2.py -i {INSERT_PATH_TO_YOUR_READ_1} -b {INSERT_PATH_TO_YOUR_BARCODE} -m {INSERT_PATH_TO_YOUR_MAPPING_FILE} -o out
+```
+
+## Running dada2 with OTU picking
+```
+qiime_dada2.py -i {INSERT_PATH_TO_YOUR_READ_1} -b {INSERT_PATH_TO_YOUR_BARCODE} -m {INSERT_PATH_TO_YOUR_MAPPING_FILE} -o out --pick_OTUs
 ```
 
 ##Advanced
@@ -49,7 +54,7 @@ qiime_dada2.py -i {INSERT_PATH_TO_YOUR_READ_1} -b {INSERT_PATH_TO_YOUR_BARCODE} 
 	```
 	align_seqs.py -i dada2.fasta
 	make_phylogeny.py -i pynast_aligned/dada2_aligned.fasta -o dada2.tre
-	python remove_pynast_failures.py -f pynast_aligned/dada2_failures.fasta -i dada2_w_tax.biom -o dada2_w_tax_no_pynast_failures.biom
+	remove_pynast_failures.py -f pynast_aligned/dada2_failures.fasta -i dada2_w_tax.biom -o dada2_w_tax_no_pynast_failures.biom
 	```
 
 ### Picking OTUs on output of dada2\_single\_end_auto.R
@@ -75,7 +80,7 @@ qiime_dada2.py -i {INSERT_PATH_TO_YOUR_READ_1} -b {INSERT_PATH_TO_YOUR_BARCODE} 
 4. Build otu map and otu table:
 	```
 	cat sortmerna_picked_otus/dada2_otus.txt uclust_picked_otus/failures_otus.txt > final_otu_map.txt
-	python dada2_to_otu_table.py -i dada2.tsv -m final_otu_map.txt -o dada2_otu_table.biom
+	dada2_to_otu_table.py -i dada2.tsv -m final_otu_map.txt -o dada2_otu_table.biom
 	```
 
 5. Assign taxonomy and add to biom table:
@@ -89,7 +94,5 @@ qiime_dada2.py -i {INSERT_PATH_TO_YOUR_READ_1} -b {INSERT_PATH_TO_YOUR_BARCODE} 
 	align_seqs.py -i rep_set.fna
 	filter_alignment.py -i pynast_aligned/rep_set_aligned.fasta
 	make_phylogeny.py -i rep_set_aligned_pfiltered.fasta -o rep_set.tre
-	python ../remove_pynast_failures.py -f pynast_aligned/rep_set_failures.fasta -i dada2_otu_table_w_tax.biom -o dada2_otu_table_w_tax_no_pynast_failures.biom
+	remove_pynast_failures.py -f pynast_aligned/rep_set_failures.fasta -i dada2_otu_table_w_tax.biom -o dada2_otu_table_w_tax_no_pynast_failures.biom
 	```
-
-NOTE: You'll need to point to `dada2_single_end_auto.R`, `dada2_to_otu_table.py` and `remove_pynast_failures.py` directly as these are not installed and are just custom scripts I wrote that exist in this repository.
