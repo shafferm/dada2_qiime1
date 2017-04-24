@@ -8,13 +8,24 @@ First create a new conda environment:
 conda create --name dada2_qiime python=2.7 qiime R
 ``` 
 
-Then download this repository, cd into it and then run:
+Download this repository:
+```
+git clone https://github.com/shafferm/dada2_qiime1.git
+```
+
+Change directories into it and then run:
 
 ```
-Rscript setup_dada2.R
+python setupy.py install
 ```
 
-## Using dada2\_single\_end_auto.R to get DADA2 sequences as OTUs:
+## Running dada2 without OTU picking
+```
+qiime_dada2.py -i {INSERT_PATH_TO_YOUR_READ_1} -b {INSERT_PATH_TO_YOUR_BARCODE} -m {INSERT_PATH_TO_YOUR_MAPPING_FILE} -o out
+```
+
+##Advanced
+### Using dada2\_single\_end_auto.R to get DADA2 sequences as OTUs:
 1. Run split libraries:
 	```
 	split_libraries_fastq.py -i {INSERT_PATH_TO_YOUR_READ_1} -b {INSERT_PATH_TO_YOUR_BARCODE} -o slout/ -m {INSERT_PATH_TO_YOUR_MAPPING_FILE} -r 1000 -p 0.0 -n 1000 -q 0 --rev_comp_mapping_barcodes --store_demultiplexed_fastq
@@ -28,7 +39,7 @@ Rscript setup_dada2.R
 	Rscript dada2_single_end_auto.R --input_dir slout_split
 	```
 
-## Assigning taxonomy and getting a tree for DADA2 seqs
+### Assigning taxonomy and getting a tree for DADA2 seqs
 1. Assign taxonomy and add to biom table
 	```
 	assign_taxonomy.py -i dada2.fasta
@@ -41,7 +52,7 @@ Rscript setup_dada2.R
 	python remove_pynast_failures.py -f pynast_aligned/dada2_failures.fasta -i dada2_w_tax.biom -o dada2_w_tax_no_pynast_failures.biom
 	```
 
-## Picking OTUs on output of dada2\_single\_end_auto.R
+### Picking OTUs on output of dada2\_single\_end_auto.R
 1. Pick closed reference OTUs, filter out failures and pick rep set:
 	```
 	pick_otus.py -i dada2.fasta -C -m sortmerna -s .99
