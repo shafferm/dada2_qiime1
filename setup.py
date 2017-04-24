@@ -1,6 +1,7 @@
 from setuptools import setup, find_packages
 from setuptools.command.install import install
 from rpy2 import robjects
+from glob import glob
 
 __author__ = 'shafferm'
 
@@ -27,12 +28,12 @@ setup(
     cmdclass={'install': CustomInstallCommand},
     name="dada2_qiime1",
     version="0.0.0",
-    scripts=["scripts/qiime_dada2.py"],
+    install_requires=['rpy2', 'biom-format', 'numpy'],
+    scripts=glob("scripts/*.py"),
     packages=find_packages(),
     description="Using DADA2 with qiime 1",
     author="Michael Shaffer",
     author_email='michael.shaffer@ucdenver.edu',
     package_data={'': ['*.r', '*.R']},
-    include_package_data=True,
-    install_requires=['rpy2', 'biom-format', 'numpy']
+    include_package_data=True
 )
