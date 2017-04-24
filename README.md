@@ -29,7 +29,7 @@ qiime_dada2.py -i {INSERT_PATH_TO_YOUR_READ_1} -b {INSERT_PATH_TO_YOUR_BARCODE} 
 qiime_dada2.py -i {INSERT_PATH_TO_YOUR_READ_1} -b {INSERT_PATH_TO_YOUR_BARCODE} -m {INSERT_PATH_TO_YOUR_MAPPING_FILE} -o out --pick_OTUs
 ```
 
-##Advanced
+## Advanced
 ### Using dada2\_single\_end_auto.R to get DADA2 sequences as OTUs:
 1. Run split libraries:
 	```
