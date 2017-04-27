@@ -32,9 +32,9 @@ def main(args):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument("-i", "--input_fastq", help="location of read 1 fastq file")
-    parser.add_argument("-b", "--barcode_fastq", help="location barcode fastq file")
-    parser.add_argument("-m", "--mapping_file", help="location of mapping file")
+    parser.add_argument("-i", "--input_fastq", help="location of read 1 fastq file(s)")
+    parser.add_argument("-b", "--barcode_fastq", help="location barcode fastq file(s)")
+    parser.add_argument("-m", "--mapping_file", help="location of mapping file(s)")
     parser.add_argument("-o", "--output_directory", help="location of output directory")
     parser.add_argument("--pick_OTUs", help="pick otus on dada2 results", default=False, action='store_true')
     parser.add_argument("--rev_comp_mapping_barcodes", help="Reverse complement barcodes from mapping file",
