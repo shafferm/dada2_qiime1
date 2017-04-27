@@ -48,7 +48,8 @@ def cat_files(files, output):
     if subprocess.call(['cat']+files, stdout=open(output, 'w')):
         raise RuntimeError("Error in cat")
 
-def run(input_fastq, barcode_fastq, mapping_file, rev_comp_barcodes=False, pick_otus=False):
+
+def run(input_fastq, barcode_fastq, mapping_file, rev_comp_barcodes=False, pick_otus=False, similarity=.99):
     commander = CommandCaller()
     # qiime split_library command
     split_libraries_cmd = ['split_libraries_fastq.py', '-i', input_fastq, '-b', barcode_fastq, '-o', 'slout', '-m',
@@ -71,13 +72,13 @@ def run(input_fastq, barcode_fastq, mapping_file, rev_comp_barcodes=False, pick_
 
     if pick_otus:
         # pick closed ref OTUs
-        commander.add_command(['pick_otus.py', '-i', 'dada2.fasta', '-C', '-m', 'sortmerna', '-s', '.99'])
+        commander.add_command(['pick_otus.py', '-i', 'dada2.fasta', '-C', '-m', 'sortmerna', '-s', str(similarity)])
         commander.add_command(['filter_fasta.py', '-f', 'dada2.fasta', '-s', 'sortmerna_picked_otus/dada2_failures.txt',
                                '-o', 'sortmerna_picked_otus/failures.fasta'])
         commander.add_command(['pick_rep_set.py', '-i', 'sortmerna_picked_otus/dada2_otus.txt', '-o',
                                'sortmerna_picked_otus/rep_set.fna', '-f', 'dada2.fasta'])
         # pick de novo OTUs
-        commander.add_command(['pick_otus.py', '-i', 'sortmerna_picked_otus/failures.fasta', '-s', '.99'])
+        commander.add_command(['pick_otus.py', '-i', 'sortmerna_picked_otus/failures.fasta', '-s', str(similarity)])
         commander.add_command(['pick_rep_set.py', '-i', 'uclust_picked_otus/failures_otus.txt', '-o',
                                'uclust_picked_otus/rep_set.fna', '-f', 'sortmerna_picked_otus/failures.fasta'])
         commander.call_commands()
