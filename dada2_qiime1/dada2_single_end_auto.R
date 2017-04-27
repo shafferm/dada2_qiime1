@@ -43,7 +43,8 @@ run.dada2 <- function(path, analysis.name='dada2', tmp.dir='tmp', min.qual=30, q
 
 	# quality filter files
 	fnFs.filt <- paste0(tmp.dir, '/', sample.names, "_filt.fastq.gz")
-	junk <- mclapply(seq_along(fnFs), fastqFilter.multi, inputs=paste0(path, '/', fnFs), outputs=fnFs.filt, trim.len.F=5, trunc.len.F=trunc.len.F, mc.cores=threads)
+	out <- filterAndTrim(fnFs, fnFs.filt, truncLen=trunc.len.F, maxN=0, maxEE=c(2,2), truncQ=2, rm.phix=TRUE,
+              			 compress=TRUE, multithread=TRUE)
 
 	# dereplicate and run dada2
 	derepFs <- derepFastq(fnFs.filt, verbose=T)
