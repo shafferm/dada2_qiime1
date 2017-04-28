@@ -8,7 +8,6 @@ from collections import deque
 
 class CommandCaller(object):
     """A class that calls command line tasks via subprocess"""
-    # TODO: Write called commands to log
     def __init__(self, log_path='log.txt', error_path='error.txt'):
         """Takes in log and error paths to record stdout and stderr from called commands"""
         self.log_path = log_path
@@ -49,26 +48,31 @@ def cat_files(files, output):
         raise RuntimeError("Error in cat")
 
 
-def run(input_fastq, barcode_fastq, mapping_file, rev_comp_barcodes=False, pick_otus=False, similarity=.99):
+def run(input_fastq, barcode_fastq, mapping_file, rev_comp_barcodes=False, pick_otus=False, similarity=.99, skip_split=False):
     commander = CommandCaller()
-    # qiime split_library command
-    split_libraries_cmd = ['split_libraries_fastq.py', '-i', input_fastq, '-b', barcode_fastq, '-o', 'slout', '-m',
-                           mapping_file, '-r', '1000', '-p', '0.0000001', '-n', '1000', '-q', '0',
-                           '--store_demultiplexed_fastq']
-    if rev_comp_barcodes:
-        split_libraries_cmd += ['--rev_comp_mapping_barcodes']
-    commander.add_command(split_libraries_cmd)
-    # qiime split_sequence_file_on_sample_ids.py command
-    commander.add_command(['split_sequence_file_on_sample_ids.py', '-i', 'slout/seqs.fastq', '-o', 'slout_split/',
-                           '--file_type', 'fastq'])
-    # call first two commands so we are ready for dada2
-    commander.call_commands()
+
+    if skip_split:
+        split_dir = input_fastq
+    else:
+        # qiime split_library command
+        split_libraries_cmd = ['split_libraries_fastq.py', '-i', input_fastq, '-b', barcode_fastq, '-o', 'slout', '-m',
+                               mapping_file, '-r', '1000', '-p', '0.0000001', '-n', '1000', '-q', '0',
+                               '--store_demultiplexed_fastq']
+        if rev_comp_barcodes:
+            split_libraries_cmd += ['--rev_comp_mapping_barcodes']
+        commander.add_command(split_libraries_cmd)
+        # qiime split_sequence_file_on_sample_ids.py command
+        commander.add_command(['split_sequence_file_on_sample_ids.py', '-i', 'slout/seqs.fastq', '-o', 'slout_split/',
+                               '--file_type', 'fastq'])
+        split_dir = 'slout_split'
+        # call first two commands so we are ready for dada2
+        commander.call_commands()
 
     # now use rpy2 to run dada2.run
     r_source = robjects.r['source']
     _ = r_source(path.join(get_dir(), 'dada2_single_end_auto.R'), echo=False, verbose=False)
     r_run_dada2 = robjects.r['run.dada2']
-    r_run_dada2('slout_split')
+    r_run_dada2(split_dir)
 
     if pick_otus:
         # pick closed ref OTUs
@@ -99,7 +103,6 @@ def run(input_fastq, barcode_fastq, mapping_file, rev_comp_barcodes=False, pick_
         commander.add_command(['make_phylogeny.py', '-i', 'rep_set_aligned_pfiltered.fasta', '-o', 'rep_set.tre'])
         commander.add_command(['remove_pynast_failures.py', '-f', 'pynast_aligned/rep_set_failures.fasta', '-i',
                                'dada2_otu_table_w_tax.biom', '-o', 'dada2_otu_table_w_tax_no_pynast_failures.biom'])
-
     else:
         # qiime assign taxonomy
         commander.add_command(['assign_taxonomy.py', '-i', 'dada2.fasta'])
