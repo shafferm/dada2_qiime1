@@ -2,10 +2,13 @@
 Generating all required files for `core_diversity_analyses.py` using QIIME 1 and DADA2 for denoising.
 
 ## Setting up
-First create a new conda environment:
+It is recommended to run all of this in a conda environment. If you have not installed conda and bioconda then I recommend you check out their [website](https://bioconda.github.io/) and follow the instructions to both install miniconda and add the bioconda and r channels.
+
+First create a new conda environment and activate it:
 
 ```
 conda create --name dada2_qiime python=2.7 qiime R rpy2
+source activate dada2_qiime
 ``` 
 
 Download this repository:
@@ -13,9 +16,10 @@ Download this repository:
 git clone https://github.com/shafferm/dada2_qiime1.git
 ```
 
-Change directories into it and then run:
+Change directories into it and then run the setup.py file:
 
 ```
+cd dada2_qiime1
 python setup.py install
 ```
 
