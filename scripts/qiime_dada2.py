@@ -47,7 +47,7 @@ if __name__ == '__main__':
     parser.add_argument("-o", "--output_directory", help="location of output directory")
     parser.add_argument("--pick_OTUs", help="pick otus on dada2 results", default=False, action='store_true')
     parser.add_argument("--similarity", help="similarity threshold for OTU picking, only used with --pick_OTUs flag",
-                        default=.99, type=float)
+                        default=.97, type=float)
     parser.add_argument("--rev_comp_mapping_barcodes", help="Reverse complement barcodes from mapping file",
                         default=False, action='store_true')
     parser.add_argument("--skip_split", help="skip split libraries and split sequences, give folder of fastq files to "

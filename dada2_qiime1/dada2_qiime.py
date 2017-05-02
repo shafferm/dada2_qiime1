@@ -48,7 +48,8 @@ def cat_files(files, output):
         raise RuntimeError("Error in cat")
 
 
-def run(input_fastq, barcode_fastq, mapping_file, rev_comp_barcodes=False, pick_otus=False, similarity=.99, skip_split=False):
+def run(input_fastq, barcode_fastq, mapping_file, rev_comp_barcodes=False, pick_otus=False, similarity=.97,
+        skip_split=False):
     commander = CommandCaller()
 
     if skip_split:
