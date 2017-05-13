@@ -20,6 +20,7 @@ def main(args):
     rev_comp_barcodes = args.rev_comp_mapping_barcodes
     pick_otus = args.pick_OTUs
     similarity = args.similarity
+    procs = args.procs
 
     if similarity <= 0 or similarity > 1:
         raise ValueError("Similarity value must be between 0 and 1, %s given" % similarity)
@@ -36,7 +37,7 @@ def main(args):
     os.chdir(output_dir)
 
     # run qiime with dada2 denoising
-    run(input_fastq, barcode_fastq, mapping, rev_comp_barcodes, pick_otus, similarity, skip_split)
+    run(input_fastq, barcode_fastq, mapping, rev_comp_barcodes, pick_otus, similarity, skip_split, procs)
 
 
 if __name__ == '__main__':
@@ -52,6 +53,7 @@ if __name__ == '__main__':
                         default=False, action='store_true')
     parser.add_argument("--skip_split", help="skip split libraries and split sequences, give folder of fastq files to "
                                              "-i parameter", default=False, action='store_true')
+    parser.add_argument("--procs", help="number of processors to use in dada2 step", default=None, type=int)
     parser.add_argument("--force", help="force overwrite of output directory if it already exists", default=False,
                         action='store_true')
     args = parser.parse_args()
