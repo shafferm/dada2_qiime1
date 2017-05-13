@@ -64,15 +64,14 @@ qiime_dada2.py -i {INSERT_PATH_TO_YOUR_READ_1} -b {INSERT_PATH_TO_YOUR_BARCODE} 
 ### Picking OTUs on output of dada2\_single\_end_auto.R
 1. Pick closed reference OTUs, filter out failures and pick rep set:
 	```
-	pick_otus.py -i dada2.fasta -C -m sortmerna -s .99
-	filter_fasta.py -f dada2.fasta -s sortmerna_picked_otus/dada2_failures.txt -o sortmerna_picked_otus/dada2_failures.fasta
+	pick_otus.py -i dada2.fasta -C -m sortmerna -s .97
 	filter_fasta.py -f dada2.fasta -s sortmerna_picked_otus/dada2_failures.txt -o sortmerna_picked_otus/failures.fasta
 	pick_rep_set.py -i sortmerna_picked_otus/dada2_otus.txt -o sortmerna_picked_otus/rep_set.fna -f dada2.fasta
 	```
 
 2. Pick de novo OTUs and pick rep set:
 	```
-	pick_otus.py -i sortmerna_picked_otus/failures.fasta -s .99
+	pick_otus.py -i sortmerna_picked_otus/failures.fasta -s .97
 	pick_rep_set.py -i uclust_picked_otus/failures_otus.txt -o uclust_picked_otus/rep_set.fna -f sortmerna_picked_otus/failures.fasta
 	```
 
