@@ -29,7 +29,7 @@ fastqFilter.multi <- function(i, inputs, outputs, trim.len.F, trunc.len.F) {
   fastqFilter(inputs[i], outputs[i], maxEE=2,  rm.phix=TRUE, trimLeft=trim.len.F, truncLen=trunc.len.F, compress=TRUE)
 }
 
-run.dada2 <- function(path, analysis.name='dada2', tmp.dir='tmp', min.qual=30, quant=.2, threads=3, keep.tmp=F) {
+run.dada2 <- function(path, analysis.name='dada2', tmp.dir='tmp', min.qual=30, quant=.2, threads=3, skip.len=10, keep.tmp=F) {
 	print(threads)
 	# setup
 	fnFs <- list.files(path)
@@ -37,7 +37,8 @@ run.dada2 <- function(path, analysis.name='dada2', tmp.dir='tmp', min.qual=30, q
 	dir.create(tmp.dir)
 
 	# determine truncation point
-	first.bad.F <- unlist(mclapply(paste0(path, '/', fnFs), find.first.bad, first.under=min.qual, mc.cores=threads))
+	first.bad.F <- unlist(mclapply(paste0(path, '/', fnFs), find.first.bad, first.under=min.qual, ignore.bases=skip.len, mc.cores=threads))
+	print(first.bad.F)
 	read.len.F <- unlist(mclapply(paste0(path, '/', fnFs), find.read.len, mc.cores=threads))
 	trunc.len.F <- min(c(quantile(first.bad.F, quant), read.len.F))
 	print(trunc.len.F)
@@ -89,6 +90,7 @@ if (!interactive()) {
 	p <- add_argument(p, "--num_threads", help="Number of threads to use for multiprocessing", type="numeric", default=3)
 	p <- add_argument(p, "--min_qual", help="Minimum average quality score to call a read position good", type="numeric", default=30)
 	p <- add_argument(p, "--quantile", help="Quantile of lengths where mean quality meeds min_qual to use as truncation lenght [0-1]", default=.2)
+	p <- add_argument(p, "--skip_len", help="Number of bases to skip before starting analysis", default=10)
 
 	# parse args
 	argv <- parse_args(p)
@@ -101,6 +103,7 @@ if (!interactive()) {
 	}
 	min.qual <- argv$min_qual
 	quant <- argv$quantile
+	skip.len = argv$skip_len
 
-	run.dada2(path, analysis.name, tmp.dir, min.qual, quant, threads)
+	run.dada2(path, analysis.name, tmp.dir, min.qual, quant, threads, skip.len)
 }
