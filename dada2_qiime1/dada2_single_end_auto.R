@@ -30,7 +30,6 @@ fastqFilter.multi <- function(i, inputs, outputs, trim.len.F, trunc.len.F) {
 }
 
 run.dada2 <- function(path, analysis.name='dada2', tmp.dir='tmp', min.qual=30, quant=.2, threads=3, skip.len=10, keep.tmp=F) {
-	print(threads)
 	# setup
 	fnFs <- list.files(path)
 	sample.names <- sapply(strsplit(fnFs, "\\.[^\\.]*$"), `[`, 1)
@@ -38,7 +37,6 @@ run.dada2 <- function(path, analysis.name='dada2', tmp.dir='tmp', min.qual=30, q
 
 	# determine truncation point
 	first.bad.F <- unlist(mclapply(paste0(path, '/', fnFs), find.first.bad, first.under=min.qual, ignore.bases=skip.len, mc.cores=threads))
-	print(first.bad.F)
 	read.len.F <- unlist(mclapply(paste0(path, '/', fnFs), find.read.len, mc.cores=threads))
 	trunc.len.F <- min(c(quantile(first.bad.F, quant), read.len.F))
 	print(trunc.len.F)

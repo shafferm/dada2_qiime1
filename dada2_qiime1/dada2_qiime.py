@@ -50,7 +50,7 @@ def cat_files(files, output):
 
 
 def run(input_fastq, barcode_fastq, mapping_file, rev_comp_barcodes=False, pick_otus=False, similarity=.97,
-        skip_split=False, procs=None):
+        skip_split=False, procs=None, skip_len=10):
     commander = CommandCaller()
 
     if skip_split:
@@ -73,13 +73,12 @@ def run(input_fastq, barcode_fastq, mapping_file, rev_comp_barcodes=False, pick_
     # set cores
     if procs is None:
         procs = cpu_count()-1
-    print procs
 
     # now use rpy2 to run dada2.run
     r_source = robjects.r['source']
     _ = r_source(path.join(get_dir(), 'dada2_single_end_auto.R'), echo=False, verbose=False)
     r_run_dada2 = robjects.r['run.dada2']
-    r_run_dada2(split_dir, threads=procs)
+    r_run_dada2(split_dir, threads=procs, skip_len=skip_len)
 
     if pick_otus:
         # pick closed ref OTUs
