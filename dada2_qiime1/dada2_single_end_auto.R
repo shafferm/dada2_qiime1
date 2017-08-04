@@ -23,17 +23,20 @@ find.first.bad <- function(i, first.under=30, ignore.bases=10) {
 find.read.len <- function(i) {
   qqF <- qa(i)[["perCycle"]]
   return(max(qqF$quality$Cycle)-2)
-}
+}               
 
 fastqFilter.multi <- function(i, inputs, outputs, trim.len.F, trunc.len.F) {
-  fastqFilter(inputs[i], outputs[i], maxEE=2,  rm.phix=TRUE, trimLeft=trim.len.F, truncLen=trunc.len.F, compress=TRUE)
+  fastqFilter(inputs[i], outputs[i], maxEE=2,  rm.phix=TRUE, trimLeft=trim.len.F, truncLen=trunc.len.F, compress=TRUE, OMP=F)
 }
 
 run.dada2 <- function(path, analysis.name='dada2', tmp.dir='tmp', min.qual=30, quant=.2, threads=3, skip.len=10, keep.tmp=F) {
 	# setup
 	fnFs <- list.files(path)
-	sample.names <- sapply(strsplit(fnFs, "\\.[^\\.]*$"), `[`, 1)
+	print(length(fnFs))
 	dir.create(tmp.dir)
+	sample.names <- sapply(fnFs, function (x) {unlist(strsplit(x, '[.]'))[1]})
+	print(sample.names)
+	print(length(sample.names))
 
 	# determine truncation point
 	first.bad.F <- unlist(mclapply(paste0(path, '/', fnFs), find.first.bad, first.under=min.qual, ignore.bases=skip.len, mc.cores=threads))
@@ -43,11 +46,20 @@ run.dada2 <- function(path, analysis.name='dada2', tmp.dir='tmp', min.qual=30, q
 
 	# quality filter files
 	fnFs.filt <- paste0(tmp.dir, '/', sample.names, "_filt.fastq.gz")
+	print(length(fnFs.filt))
+	print(length(paste0(path, '/', fnFs)))
+	print("before filt")
 	junk <- mclapply(seq_along(fnFs), fastqFilter.multi, inputs=paste0(path, '/', fnFs), outputs=fnFs.filt, trim.len.F=5, trunc.len.F=trunc.len.F, mc.cores=threads)
-
+  fnFs.filt <- paste0(tmp.dir, '/', list.files(tmp.dir))
+  sample.names <- sapply(list.files(tmp.dir), function (x) {unlist(strsplit(x, '[.]'))[1]})
+  
 	# dereplicate and run dada2
-	derepFs <- derepFastq(fnFs.filt, verbose=T)
+  print("before drep")
+  print(length(fnFs.filt))
+  print(list.files(tmp.dir))
+	derepFs <- derepFastq(fnFs.filt)
 	names(derepFs) <- sample.names
+	print ("before dada2")
 	dadaFs.lrn <- dada(derepFs, err=NULL, selfConsist=TRUE, multithread=threads)
 	errF <- dadaFs.lrn[[1]]$err_out
 	dadaFs <- dada(derepFs, err=errF, multithread=threads)

@@ -1,8 +1,7 @@
 import subprocess
 from rpy2 import robjects
 from dada2_qiime1.util import get_dir
-import os
-from os import path
+from os import path, unlink, getcwd
 from collections import deque
 from multiprocessing import cpu_count
 
@@ -41,7 +40,7 @@ class CommandCaller(object):
         """Exists """
         self.log.close()
         self.error.close()
-        os.unlink(self.error_path)
+        unlink(self.error_path)
 
 
 def cat_files(files, output):
@@ -78,7 +77,8 @@ def run(input_fastq, barcode_fastq, mapping_file, rev_comp_barcodes=False, pick_
     r_source = robjects.r['source']
     _ = r_source(path.join(get_dir(), 'dada2_single_end_auto.R'), echo=False, verbose=False)
     r_run_dada2 = robjects.r['run.dada2']
-    r_run_dada2(split_dir, threads=procs, skip_len=skip_len)
+    print split_dir, procs, skip_len, path.join(getcwd(), 'tmp')
+    r_run_dada2(split_dir, threads=procs, skip_len=skip_len, tmp_dir=path.join(getcwd(), "tmp"))
 
     if pick_otus:
         # pick closed ref OTUs
