@@ -7,14 +7,14 @@ __author__ = 'shafferm'
 
 
 class CustomInstallCommand(install):
-    """Customized setuptools install command - prints a friendly greeting."""
+    """Customized setuptools install command."""
     def run(self):
         # load r functions
         r_install_packages = robjects.r['install.packages']
         r_source = robjects.r['source']
 
         # setup bioconductor
-        r_source("https://bioconductor.org/biocLite.R")
+        r_source("http://bioconductor.org/biocLite.R")
         r_biocLite = robjects.r['biocLite']
 
         # install argparser

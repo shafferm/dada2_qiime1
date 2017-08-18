@@ -77,7 +77,6 @@ def run(input_fastq, barcode_fastq, mapping_file, rev_comp_barcodes=False, pick_
     r_source = robjects.r['source']
     _ = r_source(path.join(get_dir(), 'dada2_single_end_auto.R'), echo=False, verbose=False)
     r_run_dada2 = robjects.r['run.dada2']
-    print split_dir, procs, skip_len, path.join(getcwd(), 'tmp')
     r_run_dada2(split_dir, threads=procs, skip_len=skip_len, tmp_dir=path.join(getcwd(), "tmp"))
 
     if pick_otus:

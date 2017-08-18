@@ -32,10 +32,8 @@ fastqFilter.multi <- function(i, inputs, outputs, trim.len.F, trunc.len.F) {
 run.dada2 <- function(path, analysis.name='dada2', tmp.dir='tmp', min.qual=30, quant=.2, threads=3, skip.len=10, keep.tmp=F) {
 	# setup
 	fnFs <- list.files(path)
-	print(length(fnFs))
 	dir.create(tmp.dir)
 	sample.names <- sapply(fnFs, function (x) {unlist(strsplit(x, '[.]'))[1]})
-	print(sample.names)
 	print(length(sample.names))
 
 	# determine truncation point
@@ -45,9 +43,7 @@ run.dada2 <- function(path, analysis.name='dada2', tmp.dir='tmp', min.qual=30, q
 	print(trunc.len.F)
 
 	# quality filter files
-	fnFs.filt <- paste0(tmp.dir, '/', sample.names, "_filt.fastq.gz")
-	print(length(fnFs.filt))
-	print(length(paste0(path, '/', fnFs)))
+	fnFs.filt <- paste0(tmp.dir, '/', sample.names, ".filt.fastq.gz")
 	print("before filt")
 	junk <- mclapply(seq_along(fnFs), fastqFilter.multi, inputs=paste0(path, '/', fnFs), outputs=fnFs.filt, trim.len.F=5, trunc.len.F=trunc.len.F, mc.cores=threads)
   fnFs.filt <- paste0(tmp.dir, '/', list.files(tmp.dir))
@@ -55,8 +51,6 @@ run.dada2 <- function(path, analysis.name='dada2', tmp.dir='tmp', min.qual=30, q
   
 	# dereplicate and run dada2
   print("before drep")
-  print(length(fnFs.filt))
-  print(list.files(tmp.dir))
 	derepFs <- derepFastq(fnFs.filt)
 	names(derepFs) <- sample.names
 	print ("before dada2")
@@ -66,8 +60,8 @@ run.dada2 <- function(path, analysis.name='dada2', tmp.dir='tmp', min.qual=30, q
 	seqtab <- makeSequenceTable(dadaFs)
 
 	# remove chimeras
-	seqtab.nochim <- removeBimeraDenovo(seqtab, verbose=T)
-	print(dim(seqtab))
+	seqtab.nochim <- removeBimeraDenovo(seqtab, multithreaded=T, verbose=T)
+	print(dim(seqtab.nochim))
 
 	# make a fasta of sequences and rename rows to sequence names
 	headers <- paste0(rep("seq_", dim(seqtab.nochim)[2]), seq(1:dim(seqtab.nochim)[2]))
