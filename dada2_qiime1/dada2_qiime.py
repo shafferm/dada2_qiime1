@@ -117,8 +117,9 @@ def run(input_fastq, barcode_fastq, mapping_file, rev_comp_barcodes=False, pick_
                                '--sc-separated', 'taxonomy', '--observation-header', 'OTUID,taxonomy'])
         # qiime align sequences
         commander.add_command(['align_seqs.py', '-i', 'dada2.fasta'])
+        commander.add_command(['filter_alignment.py', '-i', 'pynast_aligned/dada2_aligned.fasta'])
         # qiime make phylogeny
-        commander.add_command(['make_phylogeny.py', '-i', 'pynast_aligned/dada2_aligned.fasta', '-o', 'dada2.tre'])
+        commander.add_command(['make_phylogeny.py', '-i', 'dada2_aligned_pfiltered.fasta', '-o', 'dada2.tre'])
         # call remove pynast failures
         commander.add_command(['remove_pynast_failures.py', '-f', 'pynast_aligned/dada2_failures.fasta', '-i',
                                'dada2_w_tax.biom', '-o', 'dada2_w_tax_no_pynast_failures.biom'])

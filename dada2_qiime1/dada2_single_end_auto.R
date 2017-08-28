@@ -6,27 +6,27 @@ library(RcppParallel, quietly=T)
 
 # methods
 find.first.bad <- function(i, first.under=30, ignore.bases=10) {
-  qqF <- qa(i)[["perCycle"]]
-  num_cycles <- max(qqF$quality$Cycle)
-  mean_quals <- vector(length = num_cycles)
-  for(j in seq(1:length(mean_quals))) {
-    curr_quals <- qqF$quality[qqF$quality$Cycle==j,]
-    # mean_quals[j] <- weighted.mean(curr_quals$Score, curr_quals$Count)
-    mean_quals[j] <- median(rep(curr_quals$Score, times=curr_quals$Count))
-  }
-  # skips first ten bases as they are often low quality
-  first_under_30 <- match(TRUE, mean_quals[ignore.bases:length(mean_quals)]<first.under, nomatch = num_cycles-ignore.bases)
-  first_under_30 <- first_under_30 + ignore.bases
-  return(first_under_30)
+	qqF <- qa(i)[["perCycle"]]
+	num_cycles <- max(qqF$quality$Cycle)
+	mean_quals <- vector(length = num_cycles)
+	for(j in seq(1:length(mean_quals))) {
+	curr_quals <- qqF$quality[qqF$quality$Cycle==j,]
+	# mean_quals[j] <- weighted.mean(curr_quals$Score, curr_quals$Count)
+	mean_quals[j] <- median(rep(curr_quals$Score, times=curr_quals$Count))
+	}
+	# skips first ten bases as they are often low quality
+	first_under_30 <- match(TRUE, mean_quals[ignore.bases:length(mean_quals)]<first.under, nomatch = num_cycles-ignore.bases)
+	first_under_30 <- first_under_30 + ignore.bases
+	return(first_under_30)
 }
 
 find.read.len <- function(i) {
-  qqF <- qa(i)[["perCycle"]]
-  return(max(qqF$quality$Cycle)-2)
+  	qqF <- qa(i)[["perCycle"]]
+  	return(max(qqF$quality$Cycle)-2)
 }               
 
 fastqFilter.multi <- function(i, inputs, outputs, trim.len.F, trunc.len.F) {
-  fastqFilter(inputs[i], outputs[i], maxEE=2,  rm.phix=TRUE, trimLeft=trim.len.F, truncLen=trunc.len.F, compress=TRUE, OMP=F)
+  	fastqFilter(inputs[i], outputs[i], maxEE=2,  rm.phix=TRUE, trimLeft=trim.len.F, truncLen=trunc.len.F, compress=TRUE, OMP=F)
 }
 
 run.dada2 <- function(path, analysis.name='dada2', tmp.dir='tmp', min.qual=30, quant=.2, threads=3, skip.len=10, keep.tmp=F) {
@@ -46,11 +46,11 @@ run.dada2 <- function(path, analysis.name='dada2', tmp.dir='tmp', min.qual=30, q
 	fnFs.filt <- paste0(tmp.dir, '/', sample.names, ".filt.fastq.gz")
 	print("before filt")
 	junk <- mclapply(seq_along(fnFs), fastqFilter.multi, inputs=paste0(path, '/', fnFs), outputs=fnFs.filt, trim.len.F=5, trunc.len.F=trunc.len.F, mc.cores=threads)
-  fnFs.filt <- paste0(tmp.dir, '/', list.files(tmp.dir))
-  sample.names <- sapply(list.files(tmp.dir), function (x) {unlist(strsplit(x, '[.]'))[1]})
+    fnFs.filt <- paste0(tmp.dir, '/', list.files(tmp.dir))
+    sample.names <- sapply(list.files(tmp.dir), function (x) {unlist(strsplit(x, '[.]'))[1]})
   
 	# dereplicate and run dada2
-  print("before drep")
+    print("before drep")
 	derepFs <- derepFastq(fnFs.filt)
 	names(derepFs) <- sample.names
 	print ("before dada2")
