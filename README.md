@@ -57,7 +57,8 @@ qiime_dada2.py -i {INSERT_PATH_TO_YOUR_READ_1} -b {INSERT_PATH_TO_YOUR_BARCODE} 
 2. Align sequences, make a tree, remove pynast failues
 	```
 	align_seqs.py -i dada2.fasta
-	make_phylogeny.py -i pynast_aligned/dada2_aligned.fasta -o dada2.tre
+	filter_alignment.py -i pynast_aligned/dada2_aligned.fasta
+	make_phylogeny.py -i dada2_aligned_pfiltered.fasta -o dada2.tre
 	remove_pynast_failures.py -f pynast_aligned/dada2_failures.fasta -i dada2_w_tax.biom -o dada2_w_tax_no_pynast_failures.biom
 	```
 
