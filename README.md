@@ -7,7 +7,7 @@ It is recommended to run all of this in a conda environment. If you have not ins
 First create a new conda environment and activate it:
 
 ```
-conda create --name dada2_qiime python=2.7 qiime R rpy2
+conda create --name dada2_qiime python=2.7 qiime rpy2 r-rcppparallel gcc
 source activate dada2_qiime
 ``` 
 
