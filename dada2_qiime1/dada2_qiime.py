@@ -79,9 +79,16 @@ def run(input_fastq, barcode_fastq, mapping_file, rev_comp_barcodes=False, pick_
     r_run_dada2 = robjects.r['run.dada2']
     r_run_dada2(split_dir, threads=procs, skip_len=skip_len, tmp_dir=path.join(getcwd(), "tmp"))
 
+    # qiime align seqs for filtering if pick_otus and process if not
+    commander.add_command(['align_seqs.py', '-i', 'dada2.fasta'])
+
     if pick_otus:
+        # filter out pynast failing dada2 seqs to only use good ones for pick_otus.py
+        commander.add_command(['remove_pynast_failures.py', '-i', 'dada2.fasta', '-f',
+                               'pynast_aligned/dada2_failures.fasta', '-o', 'dada2_no_pynast_failures.fasta'])
         # pick closed ref OTUs
-        commander.add_command(['pick_otus.py', '-i', 'dada2.fasta', '-C', '-m', 'sortmerna', '-s', str(similarity)])
+        commander.add_command(['pick_otus.py', '-i', 'dada2_no_pynast_failures.fasta', '-C', '-m', 'sortmerna', '-s',
+                               str(similarity)])
         commander.add_command(['filter_fasta.py', '-f', 'dada2.fasta', '-s', 'sortmerna_picked_otus/dada2_failures.txt',
                                '-o', 'sortmerna_picked_otus/failures.fasta'])
         commander.add_command(['pick_rep_set.py', '-i', 'sortmerna_picked_otus/dada2_otus.txt', '-o',
@@ -115,8 +122,6 @@ def run(input_fastq, barcode_fastq, mapping_file, rev_comp_barcodes=False, pick_
         commander.add_command(['biom', 'add-metadata', '-i', 'dada2.tsv', '-o', 'dada2_w_tax.biom',
                                '--observation-metadata-fp', 'uclust_assigned_taxonomy/dada2_tax_assignments.txt',
                                '--sc-separated', 'taxonomy', '--observation-header', 'OTUID,taxonomy'])
-        # qiime align sequences
-        commander.add_command(['align_seqs.py', '-i', 'dada2.fasta'])
         commander.add_command(['filter_alignment.py', '-i', 'pynast_aligned/dada2_aligned.fasta'])
         # qiime make phylogeny
         commander.add_command(['make_phylogeny.py', '-i', 'dada2_aligned_pfiltered.fasta', '-o', 'dada2.tre'])
