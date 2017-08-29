@@ -53,7 +53,7 @@ run.dada2 <- function(path, analysis.name='dada2', tmp.dir='tmp', min.qual=30, q
 	fnFs.filt <- paste0(tmp.dir, '/', sample.names, ".filt.fastq.gz")
 	junk <- mclapply(seq_along(fnFs), fastqFilter.multi, inputs=paste0(path, '/', fnFs), outputs=fnFs.filt, trim.len.F=5, trunc.len.F=trunc.len.F, mc.cores=threads)
     fnFs.filt <- paste0(tmp.dir, '/', list.files(tmp.dir))
-	sample.names <- sample.names = sapply(list.files(tmp.dir), function(i) {substr(i, 1, nchar(i)-14)})
+	sample.names <- sapply(list.files(tmp.dir), function(i) {substr(i, 1, nchar(i)-14)})
 
 	# dereplicate and run dada2
 	derepFs <- derepFastq(fnFs.filt)
