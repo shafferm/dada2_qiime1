@@ -68,7 +68,7 @@ run.dada2 <- function(path, analysis.name='dada2', tmp.dir='tmp', min.qual=30, q
 	seqs <- colnames(seqtab.nochim)
 	colnames(seqtab.nochim) <- headers
 	fasta <- paste(paste0(">", headers), seqs, sep = '\n', collapse = '\n')
-	write(paste0(fasta, '\n'), file = paste0(analysis.name, ".fasta"))
+	write(fasta, file = paste0(analysis.name, ".fasta"))
 
 	# make into tsv (classic) biom table (sequences as otu names)
 	seqtab.str <- capture.output(write.table(as.data.frame(t(seqtab.nochim)), sep = '\t', quote = FALSE))
