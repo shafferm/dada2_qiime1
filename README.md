@@ -63,37 +63,43 @@ qiime_dada2.py -i {INSERT_PATH_TO_YOUR_READ_1} -b {INSERT_PATH_TO_YOUR_BARCODE} 
 	```
 
 ### Picking OTUs on output of dada2\_single\_end_auto.R
-1. Pick closed reference OTUs, filter out failures and pick rep set:
+1. Align sequences and prefilter dada2 seqs before OTU picking
+    ```
+    align_seqs.py -i dada2.fasta
+    remove_pynast_failures.py -i dada2.fasta -f pynast_aligned/dada2_failures.fasta -o dada2_no_pynast_failures.fasta
+    ```
+
+2. Pick closed reference OTUs, filter out failures and pick rep set:
 	```
-	pick_otus.py -i dada2.fasta -C -m sortmerna -s .97
+	pick_otus.py -i dada2_no_pynast_failures.fasta -C -m sortmerna -s .97
 	filter_fasta.py -f dada2.fasta -s sortmerna_picked_otus/dada2_failures.txt -o sortmerna_picked_otus/failures.fasta
 	pick_rep_set.py -i sortmerna_picked_otus/dada2_otus.txt -o sortmerna_picked_otus/rep_set.fna -f dada2.fasta
 	```
 
-2. Pick de novo OTUs and pick rep set:
+3. Pick de novo OTUs and pick rep set:
 	```
 	pick_otus.py -i sortmerna_picked_otus/failures.fasta -s .97
 	pick_rep_set.py -i uclust_picked_otus/failures_otus.txt -o uclust_picked_otus/rep_set.fna -f sortmerna_picked_otus/failures.fasta
 	```
 
-3. Concatenate rep_set.fna files from closed and denovo steps:
+4. Concatenate rep_set.fna files from closed and denovo steps:
 	```
 	cat sortmerna_picked_otus/rep_set.fna uclust_picked_otus/rep_set.fna > rep_set.fna
 	```
 
-4. Build otu map and otu table:
+5. Build otu map and otu table:
 	```
 	cat sortmerna_picked_otus/dada2_otus.txt uclust_picked_otus/failures_otus.txt > final_otu_map.txt
 	dada2_to_otu_table.py -i dada2.tsv -m final_otu_map.txt -o dada2_otu_table.biom
 	```
 
-5. Assign taxonomy and add to biom table:
+6. Assign taxonomy and add to biom table:
 	```
 	assign_taxonomy.py -i rep_set.fna
 	biom add-metadata -i dada2_otu_table.biom --observation-metadata-fp uclust_assigned_taxonomy/rep_set_tax_assignments.txt -o dada2_otu_table_w_tax.biom --sc-separated taxonomy --observation-header OTUID,taxonomy
 	```
 
-6. Align sequences, make a tree, remove pynast failues:
+7. Align sequences, make a tree, remove pynast failues:
 	```
 	align_seqs.py -i rep_set.fna
 	filter_alignment.py -i pynast_aligned/rep_set_aligned.fasta
