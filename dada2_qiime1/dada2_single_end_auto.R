@@ -64,7 +64,7 @@ run.dada2 <- function(path, analysis.name='dada2', tmp.dir='tmp', min.qual=30, q
 	seqtab <- makeSequenceTable(dadaFs)
 
 	# remove chimeras
-	seqtab.nochim <- removeBimeraDenovo(seqtab, multithreaded=T, verbose=T)
+	seqtab.nochim <- removeBimeraDenovo(seqtab, verbose=T)
 	print(dim(seqtab.nochim))
 
 	# make a fasta of sequences and rename rows to sequence names
