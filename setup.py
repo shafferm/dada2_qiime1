@@ -36,5 +36,7 @@ setup(
     author="Michael Shaffer",
     author_email='michael.shaffer@ucdenver.edu',
     package_data={'': ['*.r', '*.R']},
-    include_package_data=True
+    include_package_data=True,
+    url="https://github.com/shafferm/dada2_qiime1/",
+    download_url="https://github.com/shafferm/dada2_qiime1/tarball/%s" % __version__
 )
