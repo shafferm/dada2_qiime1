@@ -4,6 +4,7 @@ from rpy2 import robjects
 from glob import glob
 
 __author__ = 'shafferm'
+__version__ = '0.1.0'
 
 
 class CustomInstallCommand(install):
@@ -27,7 +28,7 @@ class CustomInstallCommand(install):
 setup(
     cmdclass={'install': CustomInstallCommand},
     name="dada2_qiime1",
-    version="0.0.0",
+    version=__version__,
     install_requires=['rpy2', 'biom-format', 'numpy'],
     scripts=glob("scripts/*.py"),
     packages=find_packages(),
