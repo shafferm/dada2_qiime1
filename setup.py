@@ -4,7 +4,7 @@ from rpy2 import robjects
 from glob import glob
 
 __author__ = 'shafferm'
-__version__ = '0.1.0'
+__version__ = '0.1.1'
 
 
 class CustomInstallCommand(install):
