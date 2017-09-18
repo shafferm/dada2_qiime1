@@ -17,8 +17,8 @@ Install this repository:
 pip install git+https://github.com/shafferm/dada2_qiime1.git
 ```
 
-### Installing without conda (not recommended)
-Install this repository:
+### Setting up without conda (not recommended)
+First R must be installed on your system. Then install this repository:
 ```
 pip install git+https://github.com/shafferm/dada2_qiime1.git
 ```
