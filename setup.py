@@ -8,7 +8,7 @@ __version__ = '0.1.1'
 setup(
     name="dada2_qiime1",
     version=__version__,
-    install_requires=['rpy2 ==2.8', 'biom-format', 'numpy', 'qiime'],
+    install_requires=['rpy2 ==2.8.5', 'biom-format', 'numpy', 'qiime'],
     scripts=glob("scripts/*.py"),
     packages=find_packages(),
     description="Using DADA2 with qiime 1",
