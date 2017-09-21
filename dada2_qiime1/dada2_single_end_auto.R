@@ -43,6 +43,7 @@ run.dada2 <- function(path, analysis.name='dada2', tmp.dir='tmp', min.qual=30, q
 	# determine truncation point
 	first.bad.F <- unlist(mclapply(paste0(path, '/', fnFs), find.first.bad, first.under=min.qual, ignore.bases=skip.len, mc.cores=threads))
 	read.len.F <- unlist(mclapply(paste0(path, '/', fnFs), find.read.len, mc.cores=threads))
+	# TODO: fix read.len.F to find shortest position in distribution of read lens within a file
 	trunc.len.F <- min(c(quantile(first.bad.F, quant), read.len.F))
 	print(trunc.len.F)
 
