@@ -25,9 +25,6 @@ find.read.len <- function(i) {
   	return(max(qqF$quality$Cycle)-2)
 }               
 
-fastqFilter.multi <- function(i, inputs, outputs, trim.len.F, trunc.len.F) {
-  	fastqFilter(inputs[i], outputs[i], maxEE=2,  rm.phix=TRUE, trimLeft=trim.len.F, truncLen=trunc.len.F, compress=TRUE)
-}
 
 run.dada2 <- function(path, analysis.name='dada2', tmp.dir='tmp', min.qual=30, quant=.2, threads=3, skip.len=10, keep.tmp=F) {
 	# setup
@@ -39,6 +36,8 @@ run.dada2 <- function(path, analysis.name='dada2', tmp.dir='tmp', min.qual=30, q
 	}
 	fnFs <- list.files(path)
 	dir.create(tmp.dir)
+
+	setThreadOptions(threads)
 
 	# determine truncation point
 	first.bad.F <- unlist(mclapply(paste0(path, '/', fnFs), find.first.bad, first.under=min.qual, ignore.bases=skip.len, mc.cores=threads))
@@ -54,16 +53,17 @@ run.dada2 <- function(path, analysis.name='dada2', tmp.dir='tmp', min.qual=30, q
     fnFs.filt <- paste0(tmp.dir, '/', list.files(tmp.dir))
 	sample.names <- sapply(list.files(tmp.dir), function(i) {substr(i, 1, nchar(i)-14)})
 
+	# learn error rate
+	errF <- learnErrors(fnFs.filt, multithread=TRUE)
+
 	# dereplicate and run dada2
 	derepFs <- derepFastq(fnFs.filt)
 	names(derepFs) <- sample.names
-	dadaFs.lrn <- dada(derepFs, err=NULL, selfConsist=TRUE, multithread=threads)
-	errF <- dadaFs.lrn[[1]]$err_out
-	dadaFs <- dada(derepFs, err=errF, multithread=threads)
+	dadaFs <- dada(derepFs, err=errF, multithread=TRUE)
 	seqtab <- makeSequenceTable(dadaFs)
 
 	# remove chimeras
-	seqtab.nochim <- removeBimeraDenovo(seqtab, verbose=T)
+	seqtab.nochim <- removeBimeraDenovo(seqtab, verbose=TRUE, multithread=TRUE)
 	print(dim(seqtab.nochim))
 
 	# make a fasta of sequences and rename rows to sequence names
