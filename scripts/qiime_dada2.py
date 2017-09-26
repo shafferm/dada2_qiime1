@@ -9,11 +9,22 @@ import shutil
 def main(args):
     # parse arguments
     input_fastq = os.path.abspath(args.input_fastq)
-    barcode_fastq = os.path.abspath(args.barcode_fastq)
-    mapping = os.path.abspath(args.mapping_file)
+    skip_split = args.skip_split
+    if skip_split:
+        barcode_fastq = None
+        mapping = None
+    else:
+        barcode_fastq = os.path.abspath(args.barcode_fastq)
+        mapping = os.path.abspath(args.mapping_file)
     output_dir = os.path.abspath(args.output_directory)
     rev_comp_barcodes = args.rev_comp_mapping_barcodes
     pick_otus = args.pick_OTUs
+    similarity = args.similarity
+    procs = args.procs
+    skip_len = args.skip_len
+
+    if similarity <= 0 or similarity > 1:
+        raise ValueError("Similarity value must be between 0 and 1, %s given" % similarity)
 
     # make output directory
     try:
@@ -27,18 +38,24 @@ def main(args):
     os.chdir(output_dir)
 
     # run qiime with dada2 denoising
-    run(input_fastq, barcode_fastq, mapping, rev_comp_barcodes, pick_otus)
+    run(input_fastq, barcode_fastq, mapping, rev_comp_barcodes, pick_otus, similarity, skip_split, procs, skip_len)
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument("-i", "--input_fastq", help="location of read 1 fastq file(s)")
     parser.add_argument("-b", "--barcode_fastq", help="location barcode fastq file(s)")
     parser.add_argument("-m", "--mapping_file", help="location of mapping file(s)")
     parser.add_argument("-o", "--output_directory", help="location of output directory")
+    parser.add_argument("--skip_len", help="number of bases at start of read to trim", default=10, type=int)
     parser.add_argument("--pick_OTUs", help="pick otus on dada2 results", default=False, action='store_true')
+    parser.add_argument("--similarity", help="similarity threshold for OTU picking, only used with --pick_OTUs flag",
+                        default=.97, type=float)
     parser.add_argument("--rev_comp_mapping_barcodes", help="Reverse complement barcodes from mapping file",
                         default=False, action='store_true')
+    parser.add_argument("--skip_split", help="skip split libraries and split sequences, give folder of fastq files to "
+                                             "-i parameter", default=False, action='store_true')
+    parser.add_argument("--procs", help="number of processors to use in dada2 step", default=None, type=int)
     parser.add_argument("--force", help="force overwrite of output directory if it already exists", default=False,
                         action='store_true')
     args = parser.parse_args()
