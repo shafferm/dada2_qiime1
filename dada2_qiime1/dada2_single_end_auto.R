@@ -29,12 +29,11 @@ find.read.len <- function(i) {
 run.dada2 <- function(path, analysis.name='dada2', tmp.dir='tmp', min.qual=30, quant=.2, threads=3, skip.len=10, keep.tmp=F) {
 	# setup
 	fastq.re <- "\\.(fq|fastq)(\\.gz)?$"
-	fnFs <- list.files(path, fastq.re)
-	sample.names <- sub(fastq.re, "", fnFs)
+	fnFs <- paste0(path, '/', list.files(path, fastq.re))
+	sample.names <- sub(fastq.re, "", list.files(path, fastq.re))
 	if (length(sample.names) == 0) {
 		stop("No files ending in fq, fastq, fq.gz or fastq.gz found in dir")
 	}
-	fnFs <- paste0(path, '/', list.files(path))
 	dir.create(tmp.dir)
 
 	setThreadOptions(threads)
