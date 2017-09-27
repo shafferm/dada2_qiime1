@@ -34,14 +34,14 @@ run.dada2 <- function(path, analysis.name='dada2', tmp.dir='tmp', min.qual=30, q
 	if (length(sample.names) == 0) {
 		stop("No files ending in fq, fastq, fq.gz or fastq.gz found in dir")
 	}
-	fnFs <- list.files(path)
+	fnFs <- paste0(path, '/', list.files(path))
 	dir.create(tmp.dir)
 
 	setThreadOptions(threads)
 
 	# determine truncation point
-	first.bad.F <- unlist(mclapply(paste0(path, '/', fnFs), find.first.bad, first.under=min.qual, ignore.bases=skip.len, mc.cores=threads))
-	read.len.F <- unlist(mclapply(paste0(path, '/', fnFs), find.read.len, mc.cores=threads))
+	first.bad.F <- unlist(mclapply(fnFs, find.first.bad, first.under=min.qual, ignore.bases=skip.len, mc.cores=threads))
+	read.len.F <- unlist(mclapply(fnFs, find.read.len, mc.cores=threads))
 	# TODO: fix read.len.F to find shortest position in distribution of read lens within a file
 	trunc.len.F <- min(c(quantile(first.bad.F, quant), read.len.F))
 	print(trunc.len.F)
