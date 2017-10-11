@@ -47,7 +47,7 @@ run.dada2 <- function(path, analysis.name='dada2', tmp.dir='tmp', min.qual=30, q
 
 	# quality filter files
 	fnFs.filt <- paste0(tmp.dir, '/', sample.names, "_filt.fastq.gz")
-	out <- filterAndTrim(fnFs, fnFs.filt, truncLen=trunc.len.F, maxN=0, maxEE=c(2,2), truncQ=2, rm.phix=TRUE,
+	out <- filterAndTrim(fnFs, fnFs.filt, truncLen=trunc.len.F, maxN=0, maxEE=2, truncQ=2, rm.phix=TRUE,
               			 compress=TRUE, multithread=TRUE)
     fnFs.filt <- paste0(tmp.dir, '/', list.files(tmp.dir))
 	sample.names <- sapply(list.files(tmp.dir), function(i) {substr(i, 1, nchar(i)-14)})
