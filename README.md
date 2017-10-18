@@ -69,16 +69,16 @@ qiime_dada2.py -i {INSERT_PATH_TO_YOUR_READ_1} -b {INSERT_PATH_TO_YOUR_BARCODE} 
 
 ### Picking OTUs on output of dada2\_single\_end_auto.R
 1. Align sequences and prefilter dada2 seqs before OTU picking
-    ```
-    align_seqs.py -i dada2.fasta
-    remove_pynast_failures.py -i dada2.fasta -f pynast_aligned/dada2_failures.fasta -o dada2_no_pynast_failures.fasta
-    ```
+    	```
+    	align_seqs.py -i dada2.fasta
+    	remove_pynast_failures.py -i dada2.fasta -f pynast_aligned/dada2_failures.fasta -o dada2_no_pynast_failures.fasta
+    	```
 
 2. Pick closed reference OTUs, filter out failures and pick rep set:
 	```
 	pick_otus.py -i dada2_no_pynast_failures.fasta -C -m sortmerna -s .97
-	filter_fasta.py -f dada2.fasta -s sortmerna_picked_otus/dada2_failures.txt -o sortmerna_picked_otus/failures.fasta
-	pick_rep_set.py -i sortmerna_picked_otus/dada2_otus.txt -o sortmerna_picked_otus/rep_set.fna -f dada2.fasta
+	filter_fasta.py -f dada2.fasta -s sortmerna_picked_otus/dada2_no_pynast_failures_failures.txt -o sortmerna_picked_otus/failures.fasta
+	pick_rep_set.py -i sortmerna_picked_otus/dada2_no_pynast_failures_otus.txt -o sortmerna_picked_otus/rep_set.fna -f dada2.fasta
 	```
 
 3. Pick de novo OTUs and pick rep set:
@@ -94,7 +94,7 @@ qiime_dada2.py -i {INSERT_PATH_TO_YOUR_READ_1} -b {INSERT_PATH_TO_YOUR_BARCODE} 
 
 5. Build otu map and otu table:
 	```
-	cat sortmerna_picked_otus/dada2_otus.txt uclust_picked_otus/failures_otus.txt > final_otu_map.txt
+	cat sortmerna_picked_otus/dada2_no_pynast_failures_otus.txt uclust_picked_otus/failures_otus.txt > final_otu_map.txt
 	dada2_to_otu_table.py -i dada2.tsv -m final_otu_map.txt -o dada2_otu_table.biom
 	```
 
