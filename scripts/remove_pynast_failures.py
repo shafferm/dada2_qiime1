@@ -4,7 +4,6 @@ from biom import load_table
 from skbio.io import read
 import argparse
 import os
-from shutil import copyfile
 
 
 def main():
@@ -25,14 +24,12 @@ def main():
 
         table.filter(set_to_toss, invert=True, axis="observation")
         table.to_json("remove_pynast_failures.py", open(args.output_file, 'w'))
+
     elif args.input_file.endswith(".fasta") or args.input_file.endswith(".fa"):
-        if os.stat(args.output_file).st_size == 0:
-            pass
-        else:
-            with open(args.output_file, 'w') as f:
-                for seq in read(args.input_file, format='fasta'):
-                    if seq.id not in ids_to_toss:
-                        f.write('>%s\n%s\n' % (seq.id, str(seq)))
+        with open(args.output_file, 'w') as f:
+            for seq in read(args.input_file, format='fasta'):
+                if seq.id not in ids_to_toss:
+                    f.write('>%s\n%s\n' % (seq.id, str(seq)))
     else:
         raise ValueError("Input file must of type .biom, .fasta or .fa")
 
