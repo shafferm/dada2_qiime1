@@ -128,4 +128,6 @@ def run(input_fastq, barcode_fastq, mapping_file, rev_comp_barcodes=False, pick_
         # call remove pynast failures
         commander.add_command(['remove_pynast_failures.py', '-f', 'pynast_aligned/dada2_failures.fasta', '-i',
                                'dada2_w_tax.biom', '-o', 'dada2_w_tax_no_pynast_failures.biom'])
+        commander.add_command(['remove_pynast_failures.py', '-i', 'dada2.fasta', '-f',
+                               'pynast_aligned/dada2_failtures.fasta', '-o', 'dada2_no_pynast_failures.fasta'])
     commander.call_commands()
