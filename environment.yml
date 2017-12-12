@@ -1,0 +1,14 @@
+channels:
+- conda-forge
+- bioconda
+- defaults
+dependencies:
+- bioconductor-dada2=1.4.0=r3.3.2_0
+- qiime=1.9.1=np112py27_1
+- scikit-bio=0.2.3=np112py27_0
+- python=2.7.13=1
+- r-argparser=0.4=r3.3.2_0
+- r-base=3.3.2=5
+- rpy2=2.8.5=py27r3.3.2_0
+- pip:
+  - git+https://github.com/shafferm/dada2_qiime1.git
