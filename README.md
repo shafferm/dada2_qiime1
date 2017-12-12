@@ -7,6 +7,7 @@ It is recommended to run all of this in a conda environment. If you have not ins
 ### Setting up in a conda environment
 First create a new conda environment and activate it:
 
+#### First Attempt
 ```
 conda create --name dada2_qiime python=2.7 qiime rpy2 bioconductor-dada2 r-argparser
 source activate dada2_qiime
@@ -15,6 +16,12 @@ source activate dada2_qiime
 Install this repository:
 ```
 pip install git+https://github.com/shafferm/dada2_qiime1.git
+```
+
+#### Or try this
+```
+conda env create --name dada2_qiime -f environment.yml 
+source activate dada2_qiime
 ```
 
 ### Setting up without conda (not recommended)
