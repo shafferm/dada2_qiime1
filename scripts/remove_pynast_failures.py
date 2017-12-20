@@ -4,7 +4,7 @@ from biom import load_table
 from skbio.io import read
 import argparse
 import os
-
+import sys
 
 def main():
     parser = argparse.ArgumentParser()
@@ -26,12 +26,16 @@ def main():
         table.to_json("remove_pynast_failures.py", open(args.output_file, 'w'))
 
     elif args.input_file.endswith(".fasta") or args.input_file.endswith(".fa"):
-        with open(args.output_file, 'w') as f:
-            for seq in read(args.input_file, format='fasta'):
-                if seq.id not in ids_to_toss:
-                    f.write('>%s\n%s\n' % (seq.id, str(seq)))
+        if args.output_file is not None:
+            sys.stdout = open(args.output_file, 'w')
+        for seq in read(args.input_file, format='fasta'):
+            if seq.id not in ids_to_toss:
+                print('>%s\n%s' % (seq.id, str(seq)))
+        if args.output_file is not None:
+            sys.stdout.close()
     else:
         raise ValueError("Input file must of type .biom, .fasta or .fa")
+
 
 if __name__ == "__main__":
     main()
