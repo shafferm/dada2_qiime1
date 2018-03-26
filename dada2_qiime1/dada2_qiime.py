@@ -89,9 +89,10 @@ def run(input_fastq, barcode_fastq, mapping_file, rev_comp_barcodes=False, pick_
         # pick closed ref OTUs
         commander.add_command(['pick_otus.py', '-i', 'dada2_no_pynast_failures.fasta', '-C', '-m', 'sortmerna', '-s',
                                str(similarity)])
-        commander.add_command(['filter_fasta.py', '-f', 'dada2.fasta', '-s', 'sortmerna_picked_otus/dada2_failures.txt',
-                               '-o', 'sortmerna_picked_otus/failures.fasta'])
-        commander.add_command(['pick_rep_set.py', '-i', 'sortmerna_picked_otus/dada2_otus.txt', '-o',
+        commander.add_command(['filter_fasta.py', '-f', 'dada2.fasta', '-s',
+                               'sortmerna_picked_otus/dada2_no_pynast_failures_failures.txt', '-o',
+                               'sortmerna_picked_otus/failures.fasta'])
+        commander.add_command(['pick_rep_set.py', '-i', 'sortmerna_picked_otus/dada2_no_pynast_failures_otus.txt', '-o',
                                'sortmerna_picked_otus/rep_set.fna', '-f', 'dada2.fasta'])
         # pick de novo OTUs
         commander.add_command(['pick_otus.py', '-i', 'sortmerna_picked_otus/failures.fasta', '-s', str(similarity)])
@@ -100,7 +101,7 @@ def run(input_fastq, barcode_fastq, mapping_file, rev_comp_barcodes=False, pick_
         commander.call_commands()
         # form rep_set.fna, build otu map and otu table
         cat_files(['sortmerna_picked_otus/rep_set.fna', 'uclust_picked_otus/rep_set.fna'], 'rep_set.fna')
-        cat_files(['sortmerna_picked_otus/dada2_otus.txt', 'uclust_picked_otus/failures_otus.txt'], 'final_otu_map.txt')
+        cat_files(['sortmerna_picked_otus/dada2_no_pynast_failures_otus.txt', 'uclust_picked_otus/failures_otus.txt'], 'final_otu_map.txt')
         commander.add_command(['dada2_to_otu_table.py', '-i', 'dada2.tsv', '-m', 'final_otu_map.txt', '-o',
                                'dada2_otu_table.biom'])
         # assign taxonomy and add to biom table

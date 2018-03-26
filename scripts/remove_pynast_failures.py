@@ -15,14 +15,13 @@ def main():
 
     ids_to_toss = set()
     if os.stat(args.pynast_fasta).st_size != 0:
-        for seq in read(args.pynast_fasta, format='fasta'):
-            ids_to_toss.update(seq.id)
+        ids_to_toss = set([i.id for i in read("pynast_aligned_seqs/rep_set_failures.fasta", format='fasta')])
 
     if args.input_file.endswith(".biom"):
         table = load_table(args.input_file)
         set_to_toss = set(table.ids(axis="observation")) & ids_to_toss
 
-        table.filter(set_to_toss, invert=True, axis="observation")
+        table.filter(set_to_toss, invert=True, axis="observation", inplace=True)
         table.to_json("remove_pynast_failures.py", open(args.output_file, 'w'))
 
     elif args.input_file.endswith(".fasta") or args.input_file.endswith(".fa"):
