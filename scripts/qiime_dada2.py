@@ -22,6 +22,7 @@ def main(args):
     similarity = args.similarity
     procs = args.procs
     skip_len = args.skip_len
+    trunc_len = args.trunc_len
 
     if similarity <= 0 or similarity > 1:
         raise ValueError("Similarity value must be between 0 and 1, %s given" % similarity)
@@ -38,7 +39,8 @@ def main(args):
     os.chdir(output_dir)
 
     # run qiime with dada2 denoising
-    run(input_fastq, barcode_fastq, mapping, rev_comp_barcodes, pick_otus, similarity, skip_split, procs, skip_len)
+    run(input_fastq, barcode_fastq, mapping, rev_comp_barcodes, pick_otus, similarity, skip_split, procs, skip_len,
+        trunc_len)
 
 
 if __name__ == '__main__':
@@ -48,6 +50,7 @@ if __name__ == '__main__':
     parser.add_argument("-m", "--mapping_file", help="location of mapping file(s)")
     parser.add_argument("-o", "--output_directory", help="location of output directory")
     parser.add_argument("--skip_len", help="number of bases at start of read to trim", default=10, type=int)
+    parser.add_argument("--trunc_len", help="number of bases at end of read to trim", type=int)
     parser.add_argument("--pick_OTUs", help="pick otus on dada2 results", default=False, action='store_true')
     parser.add_argument("--similarity", help="similarity threshold for OTU picking, only used with --pick_OTUs flag",
                         default=.97, type=float)

@@ -49,7 +49,7 @@ def cat_files(files, output):
 
 
 def run(input_fastq, barcode_fastq, mapping_file, rev_comp_barcodes=False, pick_otus=False, similarity=.97,
-        skip_split=False, procs=None, skip_len=10):
+        skip_split=False, procs=None, skip_len=10, trunc_len=None):
     commander = CommandCaller()
 
     if skip_split:
@@ -77,7 +77,10 @@ def run(input_fastq, barcode_fastq, mapping_file, rev_comp_barcodes=False, pick_
     r_source = robjects.r['source']
     _ = r_source(path.join(get_dir(), 'dada2_single_end_auto.R'), echo=False, verbose=False)
     r_run_dada2 = robjects.r['run.dada2']
-    r_run_dada2(split_dir, threads=procs, skip_len=skip_len, tmp_dir=path.join(getcwd(), "tmp"))
+    if trunc_len is None:
+        r_run_dada2(split_dir, threads=procs, skip_len=skip_len, tmp_dir=path.join(getcwd(), "tmp"))
+    else:
+        r_run_dada2(split_dir, threads=procs, skip_len=skip_len, trunc_len=trunc_len, tmp_dir=path.join(getcwd(), "tmp"))
 
     # qiime align seqs for filtering if pick_otus and process if not
     commander.add_command(['align_seqs.py', '-i', 'dada2.fasta'])

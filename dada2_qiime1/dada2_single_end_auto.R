@@ -26,7 +26,8 @@ find.read.len <- function(i) {
 }               
 
 
-run.dada2 <- function(path, analysis.name='dada2', tmp.dir='tmp', min.qual=30, quant=.2, threads=3, skip.len=10, keep.tmp=F) {
+run.dada2 <- function(path, analysis.name='dada2', tmp.dir='tmp', min.qual=30, quant=.2, threads=3, skip.len=10,
+                      trunc.len=NA, keep.tmp=F) {
 	# setup
 	fastq.re <- "\\.(fq|fastq)(\\.gz)?$"
 	fnFs <- paste0(path, '/', list.files(path, fastq.re))
@@ -39,15 +40,17 @@ run.dada2 <- function(path, analysis.name='dada2', tmp.dir='tmp', min.qual=30, q
 	setThreadOptions(threads)
 
 	# determine truncation point
-	first.bad.F <- unlist(mclapply(fnFs, find.first.bad, first.under=min.qual, ignore.bases=skip.len, mc.cores=threads))
-	read.len.F <- unlist(mclapply(fnFs, find.read.len, mc.cores=threads))
-	# TODO: fix read.len.F to find shortest position in distribution of read lens within a file
-	trunc.len.F <- min(c(quantile(first.bad.F, quant), read.len.F))
-	print(trunc.len.F)
+	if (is.na(trunc.len)) {
+		first.bad.F <- unlist(mclapply(fnFs, find.first.bad, first.under=min.qual, ignore.bases=skip.len, mc.cores=threads))
+		read.len.F <- unlist(mclapply(fnFs, find.read.len, mc.cores=threads))
+		# TODO: fix read.len.F to find shortest position in distribution of read lens within a file
+		trunc.len <- min(c(quantile(first.bad.F, quant), read.len.F))
+		print(trunc.len)
+    }
 
 	# quality filter files
 	fnFs.filt <- paste0(tmp.dir, '/', sample.names, "_filt.fastq.gz")
-	out <- filterAndTrim(fnFs, fnFs.filt, truncLen=trunc.len.F, maxN=0, maxEE=2, truncQ=2, rm.phix=TRUE,
+	out <- filterAndTrim(fnFs, fnFs.filt, trimLeft=skip.len, truncLen=trunc.len, maxN=0, maxEE=2, truncQ=2, rm.phix=TRUE,
               			 compress=TRUE, multithread=TRUE)
     fnFs.filt <- paste0(tmp.dir, '/', list.files(tmp.dir))
 	sample.names <- sapply(list.files(tmp.dir), function(i) {substr(i, 1, nchar(i)-14)})
@@ -93,10 +96,11 @@ if (!interactive()) {
 	p <- add_argument(p, "--input_dir", help="Directory with one fastq file per sample")
 	p <- add_argument(p, "--analysis_name", help="Name to give output biom and fasta files", default="dada2")
 	p <- add_argument(p, "--temp_dir", help="Directory to store temporary files", default="tmp")
-	p <- add_argument(p, "--num_threads", help="Number of threads to use for multiprocessing", type="numeric", default=3)
+	p <- add_argument(p, "--num_threads", help="Number of threads to use for multiprocessing", type="integer", default=3)
 	p <- add_argument(p, "--min_qual", help="Minimum average quality score to call a read position good", type="numeric", default=30)
-	p <- add_argument(p, "--quantile", help="Quantile of lengths where mean quality meeds min_qual to use as truncation lenght [0-1]", default=.2)
-	p <- add_argument(p, "--skip_len", help="Number of bases to skip before starting analysis", default=10)
+	p <- add_argument(p, "--quantile", help="Quantile of lengths where mean quality meeds min_qual to use as truncation length [0-1]", type="numeric", default=.2)
+	p <- add_argument(p, "--skip_len", help="Number of bases to skip before starting analysis", type="integer", default=10)
+    p <- add_argument(p, "--trunc_len", help="Length of read to truncate at before starting analysis", type="integer", default=NA)
 
 	# parse args
 	argv <- parse_args(p)
@@ -110,6 +114,7 @@ if (!interactive()) {
 	min.qual <- argv$min_qual
 	quant <- argv$quantile
 	skip.len = argv$skip_len
+    trunc.len = argv$trunc_len
 
-	run.dada2(path, analysis.name, tmp.dir, min.qual, quant, threads, skip.len)
+	run.dada2(path, analysis.name, tmp.dir, min.qual, quant, threads, skip.len, trunc.len)
 }
