@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 from glob import glob
 
 __author__ = 'shafferm'
-__version__ = '0.1.4'
+__version__ = '0.1.5'
 
 
 setup(
